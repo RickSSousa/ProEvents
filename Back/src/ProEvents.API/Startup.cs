@@ -6,11 +6,13 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
+using ProEvents.API.Data;
 
 namespace ProEvents.API
 {
@@ -26,6 +28,10 @@ namespace ProEvents.API
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            //aqui eu defino qual contexto do banco quero usar e suas referências de conexão como params
+            services.AddDbContext<DataContext>(
+                context => context.UseSqlite(Configuration.GetConnectionString("SQLite"))
+            );
 
             services.AddControllers();
             services.AddSwaggerGen(c =>
