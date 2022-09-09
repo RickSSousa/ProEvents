@@ -1,1 +1,9 @@
-<p>eventos works!</p>
+<h1>Eventos de Components</h1>
+
+<!-- usando diretivas: -->
+<!-- ngFor vai repetir essa div de acordo com a condição passada, tipo um forEach (sim, é passado como prop da div) -->
+<div *ngFor="let evento of eventos">
+  <p><b>Tema:</b> {{ evento.Tema }}</p>
+  <p><b>Local:</b> {{ evento.Local }}</p>
+  <hr />
+</div>
