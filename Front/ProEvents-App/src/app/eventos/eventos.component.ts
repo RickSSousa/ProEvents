@@ -1,3 +1,4 @@
+import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 
 @Component({
@@ -8,27 +9,18 @@ import { Component, OnInit } from '@angular/core';
 export class EventosComponent implements OnInit {
   public eventos: any;
 
-  constructor() {}
+  constructor(private http: HttpClient) {}
 
   //esse método chama nosso getEventos antes da aplicação interpretar o html, é tipo o useEffect
   ngOnInit(): void {
-    this.getEventos;
+    this.getEventos();
   }
 
   public getEventos(): void {
-    this.eventos = [
-      {
-        Tema: 'Angular 11',
-        Local: 'Seattle',
-      },
-      {
-        Tema: '.NET 5',
-        Local: 'New York',
-      },
-      {
-        Tema: 'Angular e suas novidades',
-        Local: 'Boston',
-      },
-    ];
+    //chamando a api para pegar a resposta e atribuir na variavel eventos tds os eventos
+    this.http.get('https://localhost:5001/api/event').subscribe(
+      (response) => (this.eventos = response), //trás os eventos da api
+      (error) => console.log(error) //escreve algum erro q der
+    );
   }
 }
