@@ -3,16 +3,15 @@
 <div class="form-inline">
   <div class="form-group mb-2">
     <!-- abaixo é um two-way data binding [(ngModel)], q é responsável por manipular uma variável criada no tx de acordo com o q estou inputando e vice versa. (a tag q abraça o input deverá ser div aqui) -->
+    <label class="mr-2">Filtro: </label>
     <input
       type="text"
       class="form-control mr-2"
       placeholder="Buscar"
       [(ngModel)]="listFilter"
     />
-    <button class="btn btn-outline-success">Buscar</button>
   </div>
 </div>
-<h3>Filtro: {{ listFilter }}</h3>
 <table class="table table-stripped">
   <thead class="thead-dark">
     <tr>
@@ -48,7 +47,12 @@
       <td>{{ event.eventDate }}</td>
       <td>{{ event.amountPeople }}</td>
       <td>{{ event.lot }}</td>
-      <td>{{ event.local }}</td>
+      <td>
+        <button type="button" class="btn btn-primary btn-sm mr-2">
+          Editar
+        </button>
+        <button type="button" class="btn btn-danger btn-sm">Excluir</button>
+      </td>
     </tr>
   </tbody>
   <tfoot *ngIf="!events.length">

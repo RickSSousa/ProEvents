@@ -500,3 +500,8 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
+#DataBase
+*.db
+*.db-shm
+*.db-wal
