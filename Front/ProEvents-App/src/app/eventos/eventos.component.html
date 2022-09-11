@@ -1,9 +1,74 @@
-<h1>Eventos de Components</h1>
+<h2>Eventos</h2>
+<hr />
 
-<!-- usando diretivas: -->
-<!-- ngFor vai repetir essa div de acordo com a condição passada, tipo um forEach (sim, é passado como prop da div) -->
-<div *ngFor="let evento of eventos">
-  <p><b>Tema:</b> {{ evento.theme }}</p>
-  <p><b>Local:</b> {{ evento.local }}</p>
-  <hr />
-</div>
+<!--
+  Uso do Emmet para a criação de tags:
+  form.form-inline>.form-group.mb-2 (isso faz o form abaixo, só entender: primeiro é a tag, dps passei o class pelo ".", fechei e criei uma div com o class do bootstrap e margin botton 2)
+
+  input.form-control.mr-2[placeholder=Buscar]
+
+  btn.btn.btn-outlined-success
+-->
+<form action="" class="form-inline">
+  <div class="form-group mb-2">
+    <input type="text" class="form-control mr-2" placeholder="Buscar" />
+    <button class="btn btn-outline-success">Buscar</button>
+  </div>
+</form>
+
+<!-- Eu quero uma tabela com o class table e table-stripped, e dentro da tabela quero
+um thead com a class thead-dark e dentro disso quero um tr e dentro quero 9 th -->
+
+<table class="table table-stripped">
+  <thead class="thead-dark">
+    <tr>
+      <th>
+        <button class="btn btn-outline-light btn-sm" (click)="alterImgState()">
+          {{ viewImg ? "Ocultar" : "Exibir" }}
+        </button>
+      </th>
+      <th>#</th>
+      <th>Tema</th>
+      <th>Local</th>
+      <th>Data</th>
+      <th>Qtd Pessoas</th>
+      <th>Lote</th>
+      <th>Options</th>
+    </tr>
+  </thead>
+  <!-- se existir events, mostra o tbody -->
+  <tbody *ngIf="events && events.length">
+    <!--  diretiva estrutural - ngFor, ngIf, ngShow... -->
+    <tr *ngFor="let event of events">
+      <!--  bidings - interpolação-->
+      <td>
+        <!--  passar estilos por property biding. marginImg é uma variavel criada no ts -->
+        <img
+          src="/assets/{{ event.imageURL }}"
+          alt="image"
+          [style.width.px]="150"
+          [style.margin.px]="marginImg"
+          [collapse]="!viewImg"
+          [isAnimated]="true"
+        />
+      </td>
+      <td>{{ event.eventId }}</td>
+      <td>{{ event.theme }}</td>
+      <td>{{ event.local }}</td>
+      <td>{{ event.eventDate }}</td>
+      <td>{{ event.amountPeople }}</td>
+      <td>{{ event.lot }}</td>
+      <td>{{ event.local }}</td>
+    </tr>
+  </tbody>
+  <tfoot *ngIf="!events.length">
+    <!--  n pode esquecer d declarar q events é um array vazio, no ts-->
+    <tr>
+      <td colspan="8" class="text-center">
+        <h4>Nenhum evento encontrado!</h4>
+      </td>
+    </tr>
+  </tfoot>
+</table>
+
+<!-- {{events | json}} essa interpolação trás em js o array d objetos events -->

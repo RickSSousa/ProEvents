@@ -7,7 +7,9 @@ import { Component, OnInit } from '@angular/core';
   styleUrls: ['./eventos.component.scss'],
 })
 export class EventosComponent implements OnInit {
-  public eventos: any;
+  public events: any = [];
+  marginImg: number = 2;
+  viewImg: boolean = true;
 
   constructor(private http: HttpClient) {}
 
@@ -16,10 +18,14 @@ export class EventosComponent implements OnInit {
     this.getEventos();
   }
 
+  alterImgState() {
+    this.viewImg = !this.viewImg;
+  }
+
   public getEventos(): void {
     //chamando a api para pegar a resposta e atribuir na variavel eventos tds os eventos
     this.http.get('https://localhost:5001/api/event').subscribe(
-      (response) => (this.eventos = response), //trás os eventos da api
+      (response) => (this.events = response), //trás os eventos da api
       (error) => console.log(error) //escreve algum erro q der
     );
   }
