@@ -31,7 +31,7 @@
     </tr>
   </thead>
   <tbody *ngIf="events && events.length">
-    <tr *ngFor="let event of events">
+    <tr *ngFor="let event of eventsFiltered">
       <td>
         <img
           src="/assets/{{ event.imageURL }}"
