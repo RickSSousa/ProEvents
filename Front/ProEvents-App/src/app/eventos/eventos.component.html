@@ -1,24 +1,18 @@
 <h2>Eventos</h2>
 <hr />
-
-<!--
-  Uso do Emmet para a criação de tags:
-  form.form-inline>.form-group.mb-2 (isso faz o form abaixo, só entender: primeiro é a tag, dps passei o class pelo ".", fechei e criei uma div com o class do bootstrap e margin botton 2)
-
-  input.form-control.mr-2[placeholder=Buscar]
-
-  btn.btn.btn-outlined-success
--->
-<form action="" class="form-inline">
+<div class="form-inline">
   <div class="form-group mb-2">
-    <input type="text" class="form-control mr-2" placeholder="Buscar" />
+    <!-- abaixo é um two-way data binding [(ngModel)], q é responsável por manipular uma variável criada no tx de acordo com o q estou inputando e vice versa. (a tag q abraça o input deverá ser div aqui) -->
+    <input
+      type="text"
+      class="form-control mr-2"
+      placeholder="Buscar"
+      [(ngModel)]="listFilter"
+    />
     <button class="btn btn-outline-success">Buscar</button>
   </div>
-</form>
-
-<!-- Eu quero uma tabela com o class table e table-stripped, e dentro da tabela quero
-um thead com a class thead-dark e dentro disso quero um tr e dentro quero 9 th -->
-
+</div>
+<h3>Filtro: {{ listFilter }}</h3>
 <table class="table table-stripped">
   <thead class="thead-dark">
     <tr>
@@ -36,13 +30,9 @@ um thead com a class thead-dark e dentro disso quero um tr e dentro quero 9 th -
       <th>Options</th>
     </tr>
   </thead>
-  <!-- se existir events, mostra o tbody -->
   <tbody *ngIf="events && events.length">
-    <!--  diretiva estrutural - ngFor, ngIf, ngShow... -->
     <tr *ngFor="let event of events">
-      <!--  bidings - interpolação-->
       <td>
-        <!--  passar estilos por property biding. marginImg é uma variavel criada no ts -->
         <img
           src="/assets/{{ event.imageURL }}"
           alt="image"
@@ -62,7 +52,6 @@ um thead com a class thead-dark e dentro disso quero um tr e dentro quero 9 th -
     </tr>
   </tbody>
   <tfoot *ngIf="!events.length">
-    <!--  n pode esquecer d declarar q events é um array vazio, no ts-->
     <tr>
       <td colspan="8" class="text-center">
         <h4>Nenhum evento encontrado!</h4>
@@ -70,5 +59,3 @@ um thead com a class thead-dark e dentro disso quero um tr e dentro quero 9 th -
     </tr>
   </tfoot>
 </table>
-
-<!-- {{events | json}} essa interpolação trás em js o array d objetos events -->

@@ -10,6 +10,7 @@ export class EventosComponent implements OnInit {
   public events: any = [];
   marginImg: number = 2;
   viewImg: boolean = true;
+  listFilter: string = '';
 
   constructor(private http: HttpClient) {}
 
