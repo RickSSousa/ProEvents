@@ -5,7 +5,11 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
-using ProEvents.API.Data;
+using ProEvents.Application.Interfaces;
+using ProEvents.Application.Services;
+using ProEvents.Persistence.Context;
+using ProEvents.Persistence.Interfaces;
+using ProEvents.Persistence.Services;
 
 namespace ProEvents.API
 {
@@ -22,11 +26,18 @@ namespace ProEvents.API
         public void ConfigureServices(IServiceCollection services)
         {
             //aqui eu defino qual contexto do banco quero usar e suas referências de conexão como params
-            services.AddDbContext<DataContext>(
+            services.AddDbContext<ProEventsContext>(
                 context => context.UseSqlite(Configuration.GetConnectionString("SQLite"))
             );
 
-            services.AddControllers();
+            //Esse Newton faz com q os possíveis cycles parem a aplicação. Eles são um looping q acontece se dentro d uma entidade Y e eu estiver instanciando uma entidade X q também instancia a entidade Y, causando o possível looping por uma possível criação de entidades em ciclo
+            services.AddControllers().AddNewtonsoftJson( x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            //"Ô service, vou add um escopo aqui q, td vez q for requisitado um IEventService injete pfv o EventService :)" DEVO FAZER ISSO PARA TODAS AS INJEÇÕES D DEPENDENCIAS DO PROJETO
+            services.AddScoped<IEventService, EventService>();
+            services.AddScoped<IBasePersistence, BasePersistence>();
+            services.AddScoped<IEventPersistence, EventPersistence>();
+
             services.AddCors();
             services.AddSwaggerGen(c =>
             {
