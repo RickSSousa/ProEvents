@@ -1,38 +1,105 @@
 <div class="card rounded shadow-sm">
-  <form>
+  <form [formGroup]="form">
     <div class="p-3">
       <div class="form-row">
         <div class="form-group col-md-12">
           <label>Tema</label>
-          <input type="text" class="form-control" placeholder="Insira o Tema" />
+          <!--ACIMA: o ngClass atribui uma classe na prop class do elemento html caso algo aconteça, e esse algo eu defino na frente (nesse caso acontece se eu começar a mexer no input ou se eu colocar algo errado perante as validações)-->
+          <input
+            [ngClass]="{
+              'is-invalid':
+                form.get('theme')?.errors && form.get('theme')?.touched
+            }"
+            type="text"
+            class="form-control is-invalid"
+            formControlName="theme"
+            placeholder="Insira o Tema"
+          />
+          <!--Com o ngIf eu valido qual o momento ideal de lançar os respectivos erros de acordo com o problema passando de parametro pro hasError as propriedades dos validators de cada um definidos no ts-->
+          <div
+            class="invalid-feedback"
+            *ngIf="form.get('theme')?.hasError('required')"
+          >
+            Tema é obrigatório
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="form.get('theme')?.hasError('minlength')"
+          >
+            Deve ter no mínimo 4 caracteres
+          </div>
+          <div
+            class="invalid-feedback"
+            *ngIf="form.get('theme')?.hasError('maxlength')"
+          >
+            Deve ter no máximo 50 caracteres
+          </div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-8">
           <label>Local</label>
-          <input type="text" class="form-control" placeholder="" />
+          <input
+            type="text"
+            class="form-control is-invalid"
+            formControlName="local"
+            placeholder="local"
+          />
+          <div class="invalid-feedback">Local é obrigatório</div>
         </div>
         <div class="form-group col-md-4">
           <label>Data e Hora</label>
-          <input type="datetime" class="form-control" placeholder="" />
+          <input
+            type="datetime"
+            class="form-control is-invalid"
+            formControlName="eventDate"
+            placeholder=""
+          />
+
+          <div class="invalid-feedback">Data e Hora é obrigatório</div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-2">
           <label>Qtd Pessoas</label>
-          <input type="text" class="form-control" placeholder="" />
+          <input
+            type="text"
+            class="form-control is-invalid"
+            formControlName="amountPeople"
+            placeholder=""
+          />
+          <div class="invalid-feedback">Qtd Pessoas é obrigatório</div>
         </div>
-        <div class="form-group col-md-4">
+        <div class="form-group col-md-2">
           <label>Telefone</label>
           <input
             type="text"
-            class="form-control"
+            class="form-control is-invalid"
+            formControlName="phone"
             placeholder="(000) 90000-0000"
           />
+
+          <div class="invalid-feedback">Telefone é obrigatório</div>
         </div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-4">
           <label>Email</label>
-          <input type="text" class="form-control" placeholder="e-mail" />
+          <input
+            type="text"
+            class="form-control is-invalid"
+            formControlName="email"
+            placeholder="e-mail"
+          />
+          <div class="invalid-feedback">E-mail é obrigatório</div>
+        </div>
+        <div class="form-group col-md-4">
+          <label>Imagem</label>
+          <input
+            type="text"
+            class="form-control is-invalid"
+            formControlName="imageUrl"
+            placeholder="imagem"
+          />
+          <div class="invalid-feedback">Imagem é obrigatório</div>
         </div>
       </div>
     </div>
