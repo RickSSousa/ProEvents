@@ -22,7 +22,12 @@ import { EventosComponent } from './components/eventos/eventos.component';
 import { SpeakersComponent } from './components/speakers/speakers.component';
 import { ContactsComponent } from './components/contacts/contacts.component';
 import { DashboardComponent } from './components/dashboard/dashboard.component';
-import { ProfileComponent } from './components/profile/profile.component';
+import { ProfileComponent } from './components/user/profile/profile.component';
+import { DetailEventComponent } from './components/eventos/detail-event/detail-event.component';
+import { ListEventComponent } from './components/eventos/list-event/list-event.component';
+import { UserComponent } from './components/user/user.component';
+import { LoginComponent } from './components/user/login/login.component';
+import { RegistrationComponent } from './components/user/registration/registration.component';
 
 @NgModule({
   declarations: [
@@ -35,6 +40,11 @@ import { ProfileComponent } from './components/profile/profile.component';
     ContactsComponent,
     DashboardComponent,
     ProfileComponent,
+    DetailEventComponent,
+    ListEventComponent,
+    UserComponent,
+    LoginComponent,
+    RegistrationComponent,
   ],
   imports: [
     BrowserModule,
