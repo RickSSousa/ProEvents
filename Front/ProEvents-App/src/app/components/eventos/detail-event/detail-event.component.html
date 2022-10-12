@@ -1,37 +1,30 @@
 <div class="card rounded shadow-sm">
   <form [formGroup]="form">
     <div class="p-3">
+      <!--Pra eu ver os inputs trabalhando d forma controlada-->
+      <!-- <p>Form value: {{form.value | json}}</p>
+      <p>Form valid: {{form.status | json}}</p> -->
       <div class="form-row">
         <div class="form-group col-md-12">
           <label>Tema</label>
           <!--ACIMA: o ngClass atribui uma classe na prop class do elemento html caso algo aconteça, e esse algo eu defino na frente (nesse caso acontece se eu começar a mexer no input ou se eu colocar algo errado perante as validações)-->
           <input
             [ngClass]="{
-              'is-invalid':
-                form.get('theme')?.errors && form.get('theme')?.touched
+              'is-invalid': f.theme.errors && f.theme.touched
             }"
             type="text"
-            class="form-control is-invalid"
+            class="form-control"
             formControlName="theme"
             placeholder="Insira o Tema"
           />
           <!--Com o ngIf eu valido qual o momento ideal de lançar os respectivos erros de acordo com o problema passando de parametro pro hasError as propriedades dos validators de cada um definidos no ts-->
-          <div
-            class="invalid-feedback"
-            *ngIf="form.get('theme')?.hasError('required')"
-          >
+          <div class="invalid-feedback" *ngIf="f.theme.errors?.required">
             Tema é obrigatório
           </div>
-          <div
-            class="invalid-feedback"
-            *ngIf="form.get('theme')?.hasError('minlength')"
-          >
+          <div class="invalid-feedback" *ngIf="f.theme.errors?.minlength">
             Deve ter no mínimo 4 caracteres
           </div>
-          <div
-            class="invalid-feedback"
-            *ngIf="form.get('theme')?.hasError('maxlength')"
-          >
+          <div class="invalid-feedback" *ngIf="f.theme.errors?.maxlength">
             Deve ter no máximo 50 caracteres
           </div>
         </div>
@@ -40,75 +33,109 @@
         <div class="form-group col-md-8">
           <label>Local</label>
           <input
+            [ngClass]="{ 'is-invalid': f.local.errors && f.local.touched }"
             type="text"
-            class="form-control is-invalid"
+            class="form-control"
             formControlName="local"
             placeholder="local"
           />
-          <div class="invalid-feedback">Local é obrigatório</div>
+          <div class="invalid-feedback" *ngIf="f.local.errors?.required">
+            Local é obrigatório
+          </div>
         </div>
         <div class="form-group col-md-4">
           <label>Data e Hora</label>
           <input
+            [ngClass]="{
+              'is-invalid': f.eventDate.errors && f.eventDate.touched
+            }"
             type="datetime"
-            class="form-control is-invalid"
+            class="form-control"
             formControlName="eventDate"
             placeholder=""
           />
 
-          <div class="invalid-feedback">Data e Hora é obrigatório</div>
+          <div class="invalid-feedback" *ngIf="f.eventDate.errors?.required">
+            Data e Hora é obrigatório
+          </div>
         </div>
       </div>
       <div class="form-row">
         <div class="form-group col-md-2">
           <label>Qtd Pessoas</label>
           <input
-            type="text"
-            class="form-control is-invalid"
+            [ngClass]="{
+              'is-invalid': f.amountPeople.errors && f.amountPeople.touched
+            }"
+            type="number"
+            class="form-control"
             formControlName="amountPeople"
             placeholder=""
           />
-          <div class="invalid-feedback">Qtd Pessoas é obrigatório</div>
+          <div class="invalid-feedback" *ngIf="f.amountPeople.errors?.required">
+            Qtd Pessoas é obrigatório
+          </div>
+          <div class="invalid-feedback" *ngIf="f.amountPeople.errors?.max">
+            Número de pessoas deve ser abaixo de 120.000
+          </div>
         </div>
         <div class="form-group col-md-2">
           <label>Telefone</label>
           <input
+            [ngClass]="{ 'is-invalid': f.phone.errors && f.phone.touched }"
             type="text"
-            class="form-control is-invalid"
+            class="form-control"
             formControlName="phone"
-            placeholder="(000) 90000-0000"
+            placeholder="(00) 90000-0000"
           />
 
-          <div class="invalid-feedback">Telefone é obrigatório</div>
+          <div class="invalid-feedback" *ngIf="f.phone.errors?.required">
+            Telefone é obrigatório
+          </div>
         </div>
         <div class="form-group col-md-4">
           <label>Email</label>
           <input
+            [ngClass]="{ 'is-invalid': f.email.errors && f.email.touched }"
             type="text"
-            class="form-control is-invalid"
+            class="form-control"
             formControlName="email"
             placeholder="e-mail"
           />
-          <div class="invalid-feedback">E-mail é obrigatório</div>
+          <div class="invalid-feedback" *ngIf="f.email.errors?.required">
+            E-mail é obrigatório
+          </div>
+          <div class="invalid-feedback" *ngIf="f.email.errors?.email">
+            Digite um e-mail válido
+          </div>
         </div>
         <div class="form-group col-md-4">
           <label>Imagem</label>
           <input
+            [ngClass]="{
+              'is-invalid': f.imageUrl.errors && f.imageUrl.touched
+            }"
             type="text"
-            class="form-control is-invalid"
+            class="form-control"
             formControlName="imageUrl"
             placeholder="imagem"
           />
-          <div class="invalid-feedback">Imagem é obrigatório</div>
+          <div class="invalid-feedback" *ngIf="f.imageUrl.errors?.required">
+            Imagem é obrigatório
+          </div>
         </div>
       </div>
     </div>
     <div class="card-footer">
       <div class="d-flex">
-        <button class="btn btn-outline-secondary mr-auto border">
+        <button
+          class="btn btn-outline-secondary mr-auto border"
+          (click)="resetForm()"
+        >
           Cancelar Alteração
         </button>
-        <button class="btn btn-success">
+        <!--to bloqueando o botão d salvar enquanto o formulario n está validado por completo-->
+        <button class="btn btn-success" [disabled]="!form.valid">
           <!-- <span class="spinner-border spinner-border-sm mr-1"></span> -->
           Salvar Evento
         </button>
