@@ -10,6 +10,7 @@ using ProEvents.Application.Services;
 using ProEvents.Persistence.Context;
 using ProEvents.Persistence.Interfaces;
 using ProEvents.Persistence.Services;
+using System;
 
 namespace ProEvents.API
 {
@@ -32,6 +33,9 @@ namespace ProEvents.API
 
             //Esse Newton faz com q os possíveis cycles parem a aplicação. Eles são um looping q acontece se dentro d uma entidade Y e eu estiver instanciando uma entidade X q também instancia a entidade Y, causando o possível looping por uma possível criação de entidades em ciclo
             services.AddControllers().AddNewtonsoftJson( x => x.SerializerSettings.ReferenceLoopHandling = Newtonsoft.Json.ReferenceLoopHandling.Ignore);
+
+            //dentro do domínio da minha app e dentro de seu contexto, existe vários assemblies, procura quem ta herdando d Profile. Essa linha injeta no meu serviço a capacidade d eu trabalhar com automapper
+            services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
             //"Ô service, vou add um escopo aqui q, td vez q for requisitado um IEventService injete pfv o EventService :)" DEVO FAZER ISSO PARA TODAS AS INJEÇÕES D DEPENDENCIAS DO PROJETO
             services.AddScoped<IEventService, EventService>();

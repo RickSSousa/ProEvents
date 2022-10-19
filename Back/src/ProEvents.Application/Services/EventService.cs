@@ -1,5 +1,7 @@
 using System;
 using System.Threading.Tasks;
+using AutoMapper;
+using ProEvents.Application.Dtos;
 using ProEvents.Application.Interfaces;
 using ProEvents.Domain;
 using ProEvents.Persistence.Interfaces;
@@ -11,21 +13,28 @@ namespace ProEvents.Application.Services
     //injeção das interfaces necessárias para a execução dos métodos
     private readonly IBasePersistence _basePersistence;
     private readonly IEventPersistence _eventPersistence;
-    public EventService(IBasePersistence basePersistence, IEventPersistence eventPersistence)
+    public IMapper _mapper { get; }
+
+    public EventService(IBasePersistence basePersistence, IEventPersistence eventPersistence, IMapper mapper)
     {
       _eventPersistence = eventPersistence;
       _basePersistence = basePersistence;
+      _mapper = mapper;
       
     }
-    public async Task<Event> AddEvent(Event model)
+    public async Task<EventDto> AddEvent(EventDto model)
     {
       try
       {
-        //é adicionado meu evento pelo basePersistence, se der certo de salvar as infos, ele busca por id esse evento que acabou d ser criado e retorna para o user, se não retorna nulo
-        _basePersistence.Add<Event>(model);
+        //aqui to mapeando o tipo eventDto pra Event, pra poder ser recebido pelo meu persistence
+        var _event = _mapper.Map<Event>(model);
+        _basePersistence.Add<Event>(_event);
+
         if(await _basePersistence.SaveChangesAsync())
         {
-          return await _eventPersistence.GetEventByIdAsync(model.Id, false); //coloquei false pq n quero trazer os speakers desse evento aqui
+          //como esse metodo tbm retorna um Dto, tenho q fz o caminho inverso (lembrando d passar o _event no parametro, ao invés do model, pq agr são d tipos !=)
+          var result = await _eventPersistence.GetEventByIdAsync(_event.Id, false); 
+          return _mapper.Map<EventDto>(result); 
         }
         return null;
       }
@@ -35,7 +44,7 @@ namespace ProEvents.Application.Services
       }
     }
 
-    public async Task<Event> UpdateEvent(int eventId, Event model)
+    public async Task<EventDto> UpdateEvent(int eventId, EventDto model)
     {
       try
       {
@@ -46,10 +55,14 @@ namespace ProEvents.Application.Services
 
         model.Id = _event.Id; //isso seta o id no model caso ele tenha vindo sem esse dado
 
-        _basePersistence.Update(model);
+        _mapper.Map(model, _event);
+
+        _basePersistence.Update<Event>(_event);
+
         if(await _basePersistence.SaveChangesAsync())
         {
-          return await _eventPersistence.GetEventByIdAsync(eventId, false);
+          var result = await _eventPersistence.GetEventByIdAsync(_event.Id, false); 
+          return _mapper.Map<EventDto>(result); 
         }
         return null;
       }
@@ -76,7 +89,7 @@ namespace ProEvents.Application.Services
       }
     }
 
-    public async Task<Event[]> GetAllEventsAsync(bool includeSpeakers = false)
+    public async Task<EventDto[]> GetAllEventsAsync(bool includeSpeakers = false)
     {
       try
       {
@@ -84,7 +97,30 @@ namespace ProEvents.Application.Services
         var events = await _eventPersistence.GetAllEventsAsync(includeSpeakers);
         if(events == null) return null;
 
-        return events;
+        // SOLUÇÃO DE MAPEAMENTO D DADOS MAIS VERBOSA: 
+        //através dessa lista d EventDto, eu consigo retornar apenas os campos necessários no ato do Get, evitando exposição d dados desnecessária
+        // var eventReturn = new List<EventDto>();
+
+        // foreach (var item in events)
+        // {
+        //     eventReturn.Add( new EventDto(){
+        //         Id = item.Id,
+        //         Local = item.Local,
+        //         EventDate = item.EventDate.ToString(),
+        //         Theme = item.Theme,
+        //         AmountPeople = item.AmountPeople,
+        //         ImageUrl = item.ImageUrl,
+        //         Phone = item.Phone,
+        //         Email = item.Email
+        //     });
+        // }
+
+        //SOLUÇÃO MENOS VERBOSA:
+
+        var results = _mapper.Map<EventDto[]>(events);
+
+        return results;
+
       }
       catch (Exception ex)
       {
@@ -92,7 +128,7 @@ namespace ProEvents.Application.Services
       }
     }
 
-    public async Task<Event[]> GetAllEventsByThemeAsync(string theme, bool includeSpeakers = false)
+    public async Task<EventDto[]> GetAllEventsByThemeAsync(string theme, bool includeSpeakers = false)
     {
       //segue o mesmo princípio do anterior, mas puxando por tema
       try
@@ -100,7 +136,9 @@ namespace ProEvents.Application.Services
         var events = await _eventPersistence.GetAllEventsByThemeAsync(theme, includeSpeakers);
         if(events == null) return null;
 
-        return events;
+        var results = _mapper.Map<EventDto[]>(events);
+
+        return results;
       }
       catch (Exception ex)
       {
@@ -108,7 +146,7 @@ namespace ProEvents.Application.Services
       }
     }
 
-    public async Task<Event> GetEventByIdAsync(int eventId, bool includeSpeakers = false)
+    public async Task<EventDto> GetEventByIdAsync(int eventId, bool includeSpeakers = false)
     {
       //segue o mesmo princípio do anterior, mas puxando por Id
       try
@@ -116,7 +154,10 @@ namespace ProEvents.Application.Services
         var _event = await _eventPersistence.GetEventByIdAsync(eventId, includeSpeakers);
         if(_event == null) return null;
 
-        return _event;
+        //aqui to mapeando meu _event q é recebe o tipo Event da minha persistence para o tipo EventDto, fazendo com q eu n retorna algo do domínio do meu app
+        var result = _mapper.Map<EventDto>(_event);
+
+        return result;
       }
       catch (Exception ex)
       {

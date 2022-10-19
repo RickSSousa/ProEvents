@@ -3,7 +3,7 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using ProEvents.Application.Interfaces;
-using ProEvents.Domain;
+using ProEvents.Application.Dtos;
 
 namespace ProEvents.API.Controllers
 {
@@ -26,7 +26,9 @@ namespace ProEvents.API.Controllers
                 //aqui já vou definir q quero q traga os speakers dos events
                 var events = await _eventService.GetAllEventsAsync(true);
                 //se n achar eventos retorna erro, se achar retorna os eventos
-                if (events == null) return NotFound("Events not found");
+                if (events == null) return NoContent();
+
+                
 
                 return Ok(events);
             }
@@ -38,13 +40,13 @@ namespace ProEvents.API.Controllers
         }
         
         [HttpGet("id/{id}")]
-        public async Task<ActionResult<Event>> GetById(int id)
+        public async Task<IActionResult> GetById(int id)
         //com o IActionResult, n consigo especificar se to trabalhando com 1 ou uma coleção d eventos, mas com o ActionResult<> consigo
         {
             try
             {
                 var _event = await _eventService.GetEventByIdAsync(id, true);
-                if(_event == null) return NotFound("Event by Id not found");
+                if(_event == null) return NoContent();
 
                 return Ok(_event);
             }
@@ -56,12 +58,12 @@ namespace ProEvents.API.Controllers
 
         //especificar a rota assim é importante pois, se eu só passo o parametro, o http pd tentar jogar um numa chamada pra id e vice-versa
         [HttpGet("theme/{theme}")]
-        public async Task<ActionResult<Event>> GetByTheme(string theme)
+        public async Task<IActionResult> GetByTheme(string theme)
         {
             try
             {
                 var events = await _eventService.GetAllEventsByThemeAsync(theme, true);
-                if(events == null) return NotFound("Events by theme not found");
+                if(events == null) return NoContent();
 
                 return Ok(events);
             }
@@ -72,12 +74,12 @@ namespace ProEvents.API.Controllers
         }
 
         [HttpPost("post")]
-        public async Task<IActionResult> Post(Event model){
+        public async Task<IActionResult> Post(EventDto model){
             try
             {
                 // se n retornar um verdadeiro ou falso ao adicionar um evento, ele retorna o BadRequest
                 var _event = await _eventService.AddEvent(model);
-                if(_event == null) return BadRequest("error trying to add an event.");
+                if(_event == null) return NoContent();
 
                 return Ok(_event);
             }
@@ -88,11 +90,11 @@ namespace ProEvents.API.Controllers
         }
 
         [HttpPut("put/{id}")]
-        public async Task<IActionResult> Put(int id, Event model){
+        public async Task<IActionResult> Put(int id, EventDto model){
             try
             {
                 var _event = await _eventService.UpdateEvent(id, model);
-                if(_event == null) return BadRequest("error trying to update the event.");
+                if(_event == null) return NoContent();
 
                 return Ok(_event);
             }
@@ -106,10 +108,12 @@ namespace ProEvents.API.Controllers
         public async Task<IActionResult> Delete(int id){
             try
             {
+                var _event = await _eventService.GetEventByIdAsync(id, true);
+                if(_event == null) return NoContent();
                 //nesse ternário, se der verdadeiro ao deletar retorna um Ok(200), se não retorna BadRequest(400)
                 return await _eventService.DeleteEvent(id) ? 
                     Ok("Event deleted.") : 
-                    BadRequest("Event not deleted.");
+                    throw new Exception("There was a non-specific problem when trying to delete the Event");
                 
             }
             catch (Exception ex)
