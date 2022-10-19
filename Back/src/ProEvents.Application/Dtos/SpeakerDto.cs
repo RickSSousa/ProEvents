@@ -1,3 +1,5 @@
+using System.Collections.Generic;
+
 namespace ProEvents.Application.Dtos
 {
   public class SpeakerDto
