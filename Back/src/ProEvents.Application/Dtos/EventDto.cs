@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 
@@ -8,7 +9,7 @@ namespace ProEvents.Application.Dtos
         //A ideia d uma DTO é igual a d uma viewModel. Nossa intenção tbm é desvincular o máximo possível nossa API (controller) do nosso domínio
         public int Id { get; set; }
         public string Local { get; set; }
-        public string EventDate { get; set; }
+        public DateTime EventDate { get; set; }
         [Required]
         [StringLength(50, MinimumLength = 3)]
         public string Theme { get; set; }

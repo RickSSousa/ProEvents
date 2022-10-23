@@ -8,6 +8,9 @@ import { CollapseModule } from 'ngx-bootstrap/collapse';
 import { BsDropdownModule } from 'ngx-bootstrap/dropdown';
 import { TooltipModule } from 'ngx-bootstrap/tooltip';
 import { ModalModule } from 'ngx-bootstrap/modal';
+import { BsDatepickerModule } from 'ngx-bootstrap/datepicker';
+import { defineLocale } from 'ngx-bootstrap/chronos';
+import { ptBrLocale } from 'ngx-bootstrap/locale';
 
 import { ToastrModule } from 'ngx-toastr';
 import { NgxSpinnerModule } from 'ngx-spinner';
@@ -29,6 +32,7 @@ import { UserComponent } from './components/user/user.component';
 import { LoginComponent } from './components/user/login/login.component';
 import { RegistrationComponent } from './components/user/registration/registration.component';
 
+defineLocale('pt-br', ptBrLocale);
 @NgModule({
   declarations: [
     AppComponent,
@@ -57,6 +61,7 @@ import { RegistrationComponent } from './components/user/registration/registrati
     BsDropdownModule.forRoot(),
     TooltipModule.forRoot(), //é a legenda q aparece com o nome q dermos quando passamos o mouse em cima d algo
     ModalModule.forRoot(), //modal
+    BsDatepickerModule.forRoot(),
     ToastrModule.forRoot({
       //essa config dx o alerta aberto por 5s, posiciona n canto inferior direito e previne q se o user chamar esse evento várias vzs, n fica duplicando. Tem um progressBar tbm legalzin
       timeOut: 5000,

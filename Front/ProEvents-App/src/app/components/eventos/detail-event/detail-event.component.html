@@ -9,9 +9,7 @@
           <label>Tema</label>
           <!--ACIMA: o ngClass atribui uma classe na prop class do elemento html caso algo aconteça, e esse algo eu defino na frente (nesse caso acontece se eu começar a mexer no input ou se eu colocar algo errado perante as validações)-->
           <input
-            [ngClass]="{
-              'is-invalid': f.theme.errors && f.theme.touched
-            }"
+            [ngClass]="cssValidator(f.theme)"
             type="text"
             class="form-control"
             formControlName="theme"
@@ -49,10 +47,13 @@
             [ngClass]="{
               'is-invalid': f.eventDate.errors && f.eventDate.touched
             }"
+            value="{{_event.eventDate | DateFormatPipe}}"
             type="datetime"
             class="form-control"
             formControlName="eventDate"
             placeholder=""
+            bsDatepicker
+            [bsConfig]="bsConfig"
           />
 
           <div class="invalid-feedback" *ngIf="f.eventDate.errors?.required">
@@ -135,7 +136,7 @@
           Cancelar Alteração
         </button>
         <!--to bloqueando o botão d salvar enquanto o formulario n está validado por completo-->
-        <button class="btn btn-success" [disabled]="!form.valid">
+        <button class="btn btn-success" [disabled]="!form.valid" (click)="saveUpdate()">
           <!-- <span class="spinner-border spinner-border-sm mr-1"></span> -->
           Salvar Evento
         </button>

@@ -68,14 +68,14 @@
         <td class="d-none d-md-table-cell">{{ event.local }}</td>
         <td>{{ event.eventDate | DateFormatPipe }}</td>
         <td class="d-none d-md-table-cell">{{ event.amountPeople }}</td>
-        <td class="d-none d-md-table-cell">{{ event.lots[0]?.name }}</td>
+        <td class="d-none d-md-table-cell">{{ event.lots[0]?.name | uppercase }}</td>
         <!--esse "?" me salvou, pq o primeiro evento n tem lote e bugou td-->
         <td>
           <button
             type="button"
             class="btn btn-danger btn-lg"
             tooltip="Excluir"
-            (click)="openModal(template)"
+            (click)="openModal($event, template, event.id)"
           >
             <i class="fa fa-trash"></i>
           </button>
@@ -94,7 +94,7 @@
 
 <ng-template #template>
   <div class="modal-body text-center">
-    <p>Do you want to confirm?</p>
+    <p>Tem certeza que quer deletar o evento de código {{this.eventId}}?</p>
     <button type="button" class="btn btn-default" (click)="confirm()">
       Sim
     </button>

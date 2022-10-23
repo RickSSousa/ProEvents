@@ -4,9 +4,9 @@ import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
 
-import { Event } from '../../../models/Event';
 import { EventService } from '../../../services/event.service';
 import { Router } from '@angular/router';
+import { Event } from '@app/models/Event';
 
 @Component({
   selector: 'app-list-event',
@@ -22,6 +22,7 @@ export class ListEventComponent implements OnInit {
   public eventsFiltered: Event[] = [];
   public marginImg: number = 2;
   public viewImg: boolean = true;
+  public eventId: number = 0;
 
   private _listFilter: string = '';
 
@@ -91,13 +92,36 @@ export class ListEventComponent implements OnInit {
   }
 
   //MODAL
-  openModal(template: TemplateRef<any>): void {
+  openModal(event: any, template: TemplateRef<any>, eventId: number): void {
+    //esse evento n vai dx 2 eventos executarem d 1x caso um esteja dentro do outro, igual nesse caso onde o botão delete ta dentro da area onde eu clico pra ver detalhes do evento e n quero q as 2 coisas aconteção ao msm tempo quando eu clicar em delete
+    event.stopPropagation();
+    this.eventId = eventId;
     this.modalRef = this.modalService.show(template, { class: 'modal-sm' });
   }
 
   confirm(): void {
+    //Quando eu clicar no confirm do modal de deletar, vai esconder o modal, iniciar o spinner, deletar com o id d parametro do modal
+
     this.modalRef.hide();
-    this.toastr.success('O Evento foi deletado com sucesso', 'Deletado!'); // a chamada do alerta toastr
+    this.spinner.show();
+
+    //o resiçtado é any pq o observable do service tbm é, visto q a resposta da API é um objeto com a mensagem em string... daí a verificação abaixo
+    this.eventService.delete(this.eventId).subscribe(
+      (result: any) => {
+        if(result.message === "Event deleted"){
+          this.toastr.success('O Evento foi deletado com sucesso', 'Deletado!'); // a chamada do alerta toastr
+          this.spinner.hide();
+          this.getEvents();
+        }
+      },
+      (error: any) => {
+        console.error(error);
+        this.toastr.error(`Erro ao tentar deletar o evento ${this.eventId}`, 'Erro!')
+        this.spinner.hide();
+      },
+      () => {this.spinner.hide();},
+    )
+
   }
 
   decline(): void {

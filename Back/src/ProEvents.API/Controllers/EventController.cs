@@ -112,7 +112,7 @@ namespace ProEvents.API.Controllers
                 if(_event == null) return NoContent();
                 //nesse ternário, se der verdadeiro ao deletar retorna um Ok(200), se não retorna BadRequest(400)
                 return await _eventService.DeleteEvent(id) ? 
-                    Ok("Event deleted.") : 
+                    Ok(new { message = "Event deleted" }) : 
                     throw new Exception("There was a non-specific problem when trying to delete the Event");
                 
             }
