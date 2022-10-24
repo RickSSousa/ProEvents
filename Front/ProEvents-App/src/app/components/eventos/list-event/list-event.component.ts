@@ -110,17 +110,14 @@ export class ListEventComponent implements OnInit {
       (result: any) => {
         if(result.message === "Event deleted"){
           this.toastr.success('O Evento foi deletado com sucesso', 'Deletado!'); // a chamada do alerta toastr
-          this.spinner.hide();
           this.getEvents();
         }
       },
       (error: any) => {
         console.error(error);
         this.toastr.error(`Erro ao tentar deletar o evento ${this.eventId}`, 'Erro!')
-        this.spinner.hide();
       },
-      () => {this.spinner.hide();},
-    )
+    ).add(() => this.spinner.hide()); //com esse metodo, eu diminuo linhas pois n preciso mais do complete do meu observer, visto q ele só executava o spinner, e nem preciso executar o spinner no next e error mais
 
   }
 

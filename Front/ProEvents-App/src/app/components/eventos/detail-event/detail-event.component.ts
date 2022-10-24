@@ -116,37 +116,27 @@ export class DetailEventComponent implements OnInit {
   public saveUpdate(): void {
     this.spinner.show();
 
+    //essa refatoração deixa bem menos verboso, eu uso no msm método apenas os valores da variavel de estado podendo ser 2 tipos, podendo chamar 2 métodos do meu service na msm chamada aqui, pois são iguais
+
     //se meu formulário é valido, faço o post do evento
     if(this.form.valid){
-
-
       //aqui verifico o tipo do estado a ser executado
-      if(this.saveState === 'post'){
+      this._event = (this.saveState === 'post') ?
         //é necessário eu atribuir isso pq o evento pode estar vazio
-        this._event = {...this.form.value}
-        this.eventService.post(this._event).subscribe(
-          () => {this.toastr.success("Evento salvo com sucesso", "Salvo!")},
-          (error: any) => {
-            console.error(error);
-            this.spinner.hide();
-            this.toastr.error("Erro ao salvar evento", "Erro!");
-          },
-          () => {this.spinner.hide();}
-        )
-      }else{
+        {...this.form.value} :
         //aqui devo passar o id no me spread, pra atualizar
-        this._event = {id: this._event.id, ...this.form.value}
-        this.eventService.put(this._event.id, this._event).subscribe(
-          () => {this.toastr.success("Evento salvo com sucesso", "Salvo!")},
-          (error: any) => {
-            console.error(error);
-            this.spinner.hide();
-            this.toastr.error("Erro ao salvar evento", "Erro!");
-          },
-          () => {this.spinner.hide();}
-        )
-      }
+        {id: this._event.id, ...this.form.value}
 
+
+      this.eventService[this.saveState](this._event).subscribe(
+        () => {this.toastr.success("Evento salvo com sucesso", "Salvo!")},
+        (error: any) => {
+          console.error(error);
+          this.spinner.hide();
+          this.toastr.error("Erro ao salvar evento", "Erro!");
+        },
+        () => {this.spinner.hide();}
+      )
     }
   }
 }
