@@ -39,8 +39,10 @@ namespace ProEvents.API
 
             //"Ô service, vou add um escopo aqui q, td vez q for requisitado um IEventService injete pfv o EventService :)" DEVO FAZER ISSO PARA TODAS AS INJEÇÕES D DEPENDENCIAS DO PROJETO
             services.AddScoped<IEventService, EventService>();
+            services.AddScoped<ILotService, LotService>();
             services.AddScoped<IBasePersistence, BasePersistence>();
             services.AddScoped<IEventPersistence, EventPersistence>();
+            services.AddScoped<ILotPersistence, LotPersistence>();
 
             services.AddCors();
             services.AddSwaggerGen(c =>

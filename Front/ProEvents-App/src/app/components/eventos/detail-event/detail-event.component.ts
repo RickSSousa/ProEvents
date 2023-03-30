@@ -1,18 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, TemplateRef } from '@angular/core';
 import {
+  AbstractControl,
+  FormArray,
   FormBuilder,
   FormControl,
   FormGroup,
   Validators,
 } from '@angular/forms';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 
 import { Event } from '@app/models/Event';
 import { EventService } from '@app/services/event.service';
+import { LotService } from '@app/services/lot.service';
 
 import { BsLocaleService } from 'ngx-bootstrap/datepicker';
 import { NgxSpinnerService } from 'ngx-spinner';
 import { ToastrService } from 'ngx-toastr';
+import { Lot } from './../../../models/Lot';
+import { BsModalRef, BsModalService } from 'ngx-bootstrap/modal';
 
 @Component({
   selector: 'app-detail-event',
@@ -20,11 +25,23 @@ import { ToastrService } from 'ngx-toastr';
   styleUrls: ['./detail-event.component.scss'],
 })
 export class DetailEventComponent implements OnInit {
+  modalRef = {} as BsModalRef
+  eventId!: number;
   form!: FormGroup;
   //atribuindo um objeto vazio do tipo evento, pra n reclamar d var n inicializada
   _event = {} as Event;
   //esse state servirá pra sinalizar quando eu to querendo criar um evento ou atualizar um já existente. estou setando lá no loadEvent
   saveState = 'post';
+  currentLot = {id: 0, name:'', index: 0}
+
+  //vai me retornar verdade se o savestate for put (modo editar)
+  get editMode():boolean{
+    return this.saveState === 'put'
+  }
+
+  get lots(): FormArray{
+    return this.form.get('lots') as FormArray
+  }
 
   //esse método vai dar uma limpada no meu html, na hr d chamar os controls
   get f(): any {
@@ -43,27 +60,31 @@ export class DetailEventComponent implements OnInit {
 
   constructor(private formBuilder: FormBuilder,
               private localeService: BsLocaleService,
-              private router: ActivatedRoute,
+              private activatedRouter: ActivatedRoute,
               private eventService: EventService,
               private spinner: NgxSpinnerService,
-              private toastr: ToastrService) {
+              private toastr: ToastrService,
+              private router: Router,
+              private lotService: LotService,
+              private modalService: BsModalService) {
     this.localeService.use('pt-br')
   }
 
   public loadEvent(): void{
     //aqui to pegando o Id do meu evento clicado
-    const eventIdParam = this.router.snapshot.paramMap.get('id');
+    this.eventId = +this.activatedRouter.snapshot.paramMap.get('id')!;
 
-    if (eventIdParam !== null){
+    if (this.eventId !== null && this.eventId !== 0){
       //o state recebe 'put' se existir algo em eventIdParam, significando q eu abri um evento já existente
       this.saveState = 'put';
 
       this.spinner.show();
       //dps q verifiquei se n é nulo, chamo o service e converto pra inteiro o id pego ali em cima, fazendo um observer no subscribe
-      this.eventService.getEventById(+eventIdParam).subscribe(
+      this.eventService.getEventById(this.eventId).subscribe(
         (event: any) => {
           this._event = {...event};
           this.form.patchValue(this._event);
+          this._event.lots.forEach(lot => this.lots.push(this.createLot(lot)))
         },
         (error: any) => {
           this.spinner.hide();
@@ -100,7 +121,30 @@ export class DetailEventComponent implements OnInit {
       phone: ['', Validators.required],
       //validator d email valido
       email: ['', [Validators.required, Validators.email]],
+      lots: this.formBuilder.array([]) //deve ser add um array d fb pois são vários obj lots
     });
+  }
+
+  //tenho um get q pega os lots, q é um item dentro do meu formulário, crio um agrupamento e adiciono no meu array d lots, isso permite a validação individualmente
+  addLot():void{
+    this.lots.push(
+      this.createLot({id: 0} as Lot)
+    )
+  }
+
+  createLot(lot: Lot): FormGroup{
+    return this.formBuilder.group({
+        id:[lot.id],
+        name:[lot.name, Validators.required],
+        price:[lot.price, Validators.required],
+        amount:[lot.amount, Validators.required],
+        initialDate:[lot.initialDate],
+        finalDate:[lot.finalDate],
+      })
+  }
+
+  public changeDate(value: Date, index: number, field: string): void{
+    this.lots.value[index][field] = value
   }
 
   //método pra limpar o formulário (vou chamar ele no click do btn "cancelar alterações")
@@ -109,11 +153,11 @@ export class DetailEventComponent implements OnInit {
   }
 
   // jeito menos verboso de validar os campos no html desse componente
-  public cssValidator(fieldForm: FormControl) : any {
-    return {'is-invalid': fieldForm.errors && fieldForm.touched}
+  public cssValidator(fieldForm: FormControl | AbstractControl | null) : any {
+    return {'is-invalid': fieldForm?.errors && fieldForm?.touched}
   }
 
-  public saveUpdate(): void {
+  public saveEvent(): void {
     this.spinner.show();
 
     //essa refatoração deixa bem menos verboso, eu uso no msm método apenas os valores da variavel de estado podendo ser 2 tipos, podendo chamar 2 métodos do meu service na msm chamada aqui, pois são iguais
@@ -129,7 +173,11 @@ export class DetailEventComponent implements OnInit {
 
 
       this.eventService[this.saveState](this._event).subscribe(
-        () => {this.toastr.success("Evento salvo com sucesso", "Salvo!")},
+        (eventResponse: Event) => {
+          this.toastr.success("Evento salvo com sucesso", "Salvo!")
+          //isso é o reload da página quando cria um evento
+          this.router.navigate([`eventos/detalhes/${eventResponse.id}`])
+        },
         (error: any) => {
           console.error(error);
           this.spinner.hide();
@@ -138,5 +186,51 @@ export class DetailEventComponent implements OnInit {
         () => {this.spinner.hide();}
       )
     }
+  }
+
+  public saveLots(): void {
+    if(this.form.controls.lots.valid){
+      this.spinner.show()
+      this.lotService.saveLot(this.eventId, this.form.value.lots).subscribe(
+        () => {
+          this.toastr.success('Lotes salvos com Sucesso!', 'Sucesso!')
+        },
+        (error: any) => {
+          this.toastr.error('Erro ao salvar lotes', 'Erro!')
+          console.error(error)
+        }
+        ).add(() => this.spinner.hide())
+    }
+  }
+
+  public removeLot(template: TemplateRef<any>, index: number): void{
+    this.currentLot.id = this.lots.get(index + '.id')?.value
+    this.currentLot.name = this.lots.get(index + '.name')?.value
+    this.currentLot.index = index
+
+    this.modalRef = this.modalService.show(template, {class:'modal-sm'})
+  }
+
+  confirmDeleteLot(): void{
+    this.modalRef.hide()
+    this.spinner.show()
+
+    this.lotService.deleteLot(this.eventId, this.currentLot.id).subscribe(
+      () => {
+        this.toastr.success('Lot deletado com sucesso.', 'Sucesso!')
+        this.lots.removeAt(this.currentLot.index)
+      },
+      (error) => {
+        this.toastr.error(`Erro ao tentar deletar o lote ${this.currentLot.name}`)
+        console.error(error)
+      }
+    ).add(() => this.spinner.hide())
+  }
+  declineDeleteLot(): void {
+    this.modalRef.hide()
+  }
+
+  public returnLotTitle(name: string): string{
+    return name === null || name === '' ? 'Nome do lote' : name
   }
 }

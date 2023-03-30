@@ -48,8 +48,6 @@ namespace ProEvents.Application.Services
     {
       try
       {
-        //ERRO TRACKING: isso acontece pq é como se outro método estivesse em posse do elemento, não deixando ele seguir pra conclusão. Ex: quando é executado o get abaixo, ele fica em posse do Evento e n deixa ir pro método update.
-        //Resolver: adicione um .AsNoTracking() na manipulação da query para os métodos get (Ta antes dos OrderBy ou return)
         var _event = await _eventPersistence.GetEventByIdAsync(eventId, false);
         if(_event == null) return null;
 

@@ -31,6 +31,8 @@ import { ListEventComponent } from './components/eventos/list-event/list-event.c
 import { UserComponent } from './components/user/user.component';
 import { LoginComponent } from './components/user/login/login.component';
 import { RegistrationComponent } from './components/user/registration/registration.component';
+import { LotService } from './services/lot.service';
+import { NgxCurrencyModule } from 'ngx-currency';
 
 defineLocale('pt-br', ptBrLocale);
 @NgModule({
@@ -70,8 +72,9 @@ defineLocale('pt-br', ptBrLocale);
       progressBar: true,
     }), //animação de alerta na tela
     NgxSpinnerModule, //rodinha de carregamento
+    NgxCurrencyModule,
   ],
-  providers: [EventService], //outra opção d injeção
+  providers: [EventService, LotService], //outra opção d injeção
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
